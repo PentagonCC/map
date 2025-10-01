@@ -116,4 +116,8 @@ public class CustomHashMap<K, V> {
         return null;
     }
 
+    public int getSize(){
+        return this.size;
+    }
+
 }
