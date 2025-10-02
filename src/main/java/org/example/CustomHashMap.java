@@ -9,17 +9,17 @@ public class CustomHashMap<K, V> {
     private Node<K, V>[] tableElements;
     private int size;
 
-    public CustomHashMap(){
+    public CustomHashMap() {
         tableElements = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    private static class Node<K, V>{
+    private static class Node<K, V> {
         final int hash;
         final K key;
         V value;
         Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next){
+        Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -33,22 +33,21 @@ public class CustomHashMap<K, V> {
         return (key == null) ? 0 : (h = Objects.hash(key)) ^ (h >>> 16);
     }
 
-    private void resize(){
+    private void resize() {
         Node<K, V>[] oldTableElements = tableElements;
         int length = (oldTableElements == null) ? 0 : oldTableElements.length;
         int newSize = 0;
-        if(length > DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR) {
+        if (length > DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR) {
             newSize = length * 2;
-        }
-        else if(length == 0) {
+        } else if (length == 0) {
             newSize = DEFAULT_INITIAL_CAPACITY;
         }
 
         Node<K, V>[] newTableElements = new Node[newSize];
 
-        for(int i = 0; i < length; i++){
+        for (int i = 0; i < length; i++) {
             Node<K, V> node = tableElements[i];
-            while (node != null){
+            while (node != null) {
                 Node<K, V> nextNode = node.next;
                 int nodeIndex = calculateNodeIndex(newTableElements, node.hash);
                 node.next = newTableElements[nodeIndex];
@@ -56,17 +55,16 @@ public class CustomHashMap<K, V> {
                 node = nextNode;
             }
         }
-
         tableElements = newTableElements;
-
     }
 
-    public V put(K key, V value){
+
+    public V put(K key, V value) {
         int nodeHash = hash(key);
         int nodeIndex = calculateNodeIndex(tableElements, nodeHash);
 
-        for(Node<K, V> node = tableElements[nodeIndex]; node != null; node = node.next){
-            if(node.hash == nodeHash && (key == node.key || (key != null && key.equals(node.key)))){
+        for (Node<K, V> node = tableElements[nodeIndex]; node != null; node = node.next) {
+            if (node.hash == nodeHash && (key == node.key || (key != null && key.equals(node.key)))) {
                 V existValue = node.value;
                 node.value = value;
                 return existValue;
@@ -75,26 +73,25 @@ public class CustomHashMap<K, V> {
 
         tableElements[nodeIndex] = new Node<>(nodeHash, key, value, tableElements[nodeIndex]);
         size++;
-        if(size > tableElements.length * DEFAULT_LOAD_FACTOR){
+        if (size > tableElements.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
 
         return null;
     }
 
-    public V remove(K key){
+    public V remove(K key) {
         int nodeHash = hash(key);
         int nodeIndex = calculateNodeIndex(tableElements, nodeHash);
 
         Node<K, V> prev = null;
         Node<K, V> currentNode = tableElements[nodeIndex];
 
-        while (currentNode != null){
-            if(currentNode.hash == nodeHash && (key == currentNode.key || (key != null && key.equals(currentNode.key)))){
-                if(prev == null) {
+        while (currentNode != null) {
+            if (currentNode.hash == nodeHash && (key == currentNode.key || (key != null && key.equals(currentNode.key)))) {
+                if (prev == null) {
                     tableElements[nodeIndex] = currentNode.next;
-                }
-                else {
+                } else {
                     prev.next = currentNode.next;
                 }
                 size--;
@@ -119,12 +116,11 @@ public class CustomHashMap<K, V> {
         return null;
     }
 
-    public int getSize(){
+    public int getSize() {
         return this.size;
     }
 
-    public int calculateNodeIndex(Node<K, V>[] tableElements, int nodeHash){
+    public int calculateNodeIndex(Node<K, V>[] tableElements, int nodeHash) {
         return (tableElements.length - 1) & nodeHash;
     }
-
 }
