@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Objects;
+
 public class CustomHashMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -27,7 +29,8 @@ public class CustomHashMap<K, V> {
 
     private int hash(K key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        //return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return (key == null) ? 0 : (h = Objects.hash(key)) ^ (h >>> 16);
     }
 
     private void resize(){
@@ -47,7 +50,7 @@ public class CustomHashMap<K, V> {
             Node<K, V> node = tableElements[i];
             while (node != null){
                 Node<K, V> nextNode = node.next;
-                int nodeIndex = (length - 1) & node.hash;
+                int nodeIndex = calculateNodeIndex(newTableElements, node.hash);
                 node.next = newTableElements[nodeIndex];
                 newTableElements[nodeIndex] = node;
                 node = nextNode;
@@ -60,7 +63,7 @@ public class CustomHashMap<K, V> {
 
     public V put(K key, V value){
         int nodeHash = hash(key);
-        int nodeIndex = (tableElements.length - 1) & nodeHash;
+        int nodeIndex = calculateNodeIndex(tableElements, nodeHash);
 
         for(Node<K, V> node = tableElements[nodeIndex]; node != null; node = node.next){
             if(node.hash == nodeHash && (key == node.key || (key != null && key.equals(node.key)))){
@@ -81,7 +84,7 @@ public class CustomHashMap<K, V> {
 
     public V remove(K key){
         int nodeHash = hash(key);
-        int nodeIndex = (tableElements.length - 1) & nodeHash;
+        int nodeIndex = calculateNodeIndex(tableElements, nodeHash);
 
         Node<K, V> prev = null;
         Node<K, V> currentNode = tableElements[nodeIndex];
@@ -106,7 +109,7 @@ public class CustomHashMap<K, V> {
 
     public V get(K key) {
         int nodeHash = hash(key);
-        int nodeIndex = (tableElements.length - 1) & nodeHash;
+        int nodeIndex = calculateNodeIndex(tableElements, nodeHash);
 
         for (Node<K, V> node = tableElements[nodeIndex]; node != null; node = node.next) {
             if (node.hash == nodeHash && (key == node.key || (key != null && key.equals(node.key)))) {
@@ -118,6 +121,10 @@ public class CustomHashMap<K, V> {
 
     public int getSize(){
         return this.size;
+    }
+
+    public int calculateNodeIndex(Node<K, V>[] tableElements, int nodeHash){
+        return (tableElements.length - 1) & nodeHash;
     }
 
 }
